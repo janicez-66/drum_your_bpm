@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>跑步节奏增强音乐工具 - Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --bg-panel: #ffffff;
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --accent: #22c55e;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-soft: #6b7280;
+      --danger: #ef4444;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #dbeafe 0, #f9fafb 40%, #f5f5f5 100%);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 40px 40px;
+      gap: 24px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: conic-gradient(from 160deg, #22c55e, #2563eb, #22c55e);
+      position: relative;
+      box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.12);
+    }
+
+    .logo-dot::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: inherit;
+      background: #0f172a;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 11px;
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+    }
+
+    .pill-kbd {
+      padding: 1px 5px;
+      border-radius: 5px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      font-size: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: rgba(248, 250, 252, 0.8);
+    }
+
+    .button-primary-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      background: rgba(37, 99, 235, 0.07);
+      color: var(--primary);
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .button-primary-ghost:hover {
+      background: rgba(37, 99, 235, 0.12);
+      transform: translateY(-0.5px);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-tag {
+      font-size: 11px;
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .stepper {
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      width: fit-content;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: var(--text-soft);
+      background: transparent;
+    }
+
+    .step.active {
+      background: #0f172a;
+      color: #e5e7eb;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
+    }
+
+    .step-index {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .step.active .step-index {
+      border-color: rgba(248, 250, 252, 0.7);
+      background: rgba(15, 23, 42, 0.2);
+    }
+
+    .step-label {
+      white-space: nowrap;
+    }
+
+    .upload-zone {
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(148, 163, 184, 0.9);
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.9));
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .upload-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #4ade80, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ecfdf5;
+      font-size: 18px;
+      box-shadow: 0 12px 30px rgba(22, 163, 74, 0.5);
+    }
+
+    .upload-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .upload-subtitle {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      padding: 6px 12px;
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn span {
+      display: inline-flex;
+    }
+
+    .btn:hover {
+      transform: translateY(-0.5px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.09);
+      border-color: rgba(148, 163, 184, 1);
+    }
+
+    .btn-primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+      color: #f9fafb;
+      box-shadow: 0 15px 35px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.55);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .btn-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .hint-text {
+      font-size: 10px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .demo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .demo-item {
+      border-radius: 10px;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      padding: 8px 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      background: rgba(248, 250, 252, 0.9);
+      transition: all 0.14s ease;
+    }
+
+    .demo-item:hover {
+      border-color: rgba(148, 163, 184, 0.9);
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .demo-item.active {
+      border-color: rgba(37, 99, 235, 0.9);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.22);
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), rgba(248, 250, 252, 0.98));
+    }
+
+    .demo-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .demo-cover {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #22c55e, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ecfdf5;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .demo-texts {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .demo-title {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 160px;
+    }
+
+    .demo-meta {
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      gap: 6px;
+    }
+
+    .demo-badges {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 10px;
+      color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.8);
+      white-space: nowrap;
+    }
+
+    .badge-bpm {
+      border-color: rgba(34, 197, 94, 0.8);
+      color: #15803d;
+      background: rgba(22, 163, 74, 0.08);
+    }
+
+    .badge-mode {
+      border-color: rgba(37, 99, 235, 0.8);
+      color: #1d4ed8;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .main-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .main-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .song-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .song-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .song-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--text-soft);
+    }
+
+    .song-meta {
+      display: flex;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .chip-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 11px;
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .section {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+      padding: 12px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title span {
+      font-size: 14px;
+    }
+
+    .section-desc {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .section-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      flex: 1 0 150px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.14s ease;
+    }
+
+    .mode-pill:hover {
+      border-color: rgba(37, 99, 235, 0.7);
+    }
+
+    .mode-pill.active {
+      border-color: rgba(37, 99, 235, 0.9);
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), rgba(248, 250, 252, 0.98));
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+    }
+
+    .mode-radio {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mode-pill.active .mode-radio {
+      border-color: rgba(37, 99, 235, 0.95);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .mode-radio-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: transparent;
+    }
+
+    .mode-pill.active .mode-radio-dot {
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+    }
+
+    .mode-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .mode-label {
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .mode-sub {
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .bpm-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .field-label {
+      font-size: 11px;
+      color: var(--text-soft);
+      min-width: 58px;
+    }
+
+    .input-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .input {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      padding: 5px 9px;
+      font-size: 12px;
+      min-width: 72px;
+      font-family: inherit;
+      outline: none;
+      background: rgba(255, 255, 255, 0.95);
+      transition: border-color 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    .input:focus {
+      border-color: rgba(37, 99, 235, 0.9);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18);
+    }
+
+    .input[disabled] {
+      background: rgba(248, 250, 252, 0.9);
+      color: rgba(148, 163, 184, 0.9);
+      cursor: not-allowed;
+    }
+
+    .btn-mini {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      padding: 3px 7px;
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .btn-mini:hover {
+      border-color: rgba(37, 99, 235, 0.7);
+      color: var(--primary);
+    }
+
+    .bpm-indicator {
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.08);
+      color: #16a34a;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bpm-indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 3px;
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+    }
+
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pattern-card {
+      border-radius: 10px;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      padding: 8px 7px;
+      font-size: 11px;
+      cursor: pointer;
+      background: rgba(248, 250, 252, 0.96);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.14s ease;
+    }
+
+    .pattern-card:hover {
+      border-color: rgba(148, 163, 184, 0.95);
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .pattern-card.active {
+      border-color: rgba(37, 99, 235, 0.9);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.1), rgba(248, 250, 252, 0.98));
+    }
+
+    .pattern-name {
+      font-weight: 600;
+    }
+
+    .pattern-desc {
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .pattern-mini-line {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      margin-top: 3px;
+      height: 16px;
+    }
+
+    .pattern-bar {
+      flex: 1;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.7);
+    }
+
+    .pattern-card.active .pattern-bar {
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+    }
+
+    .pattern-bar.s {
+      height: 4px;
+    }
+
+    .pattern-bar.m {
+      height: 7px;
+    }
+
+    .pattern-bar.l {
+      height: 11px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(209, 213, 219, 0.9);
+      outline: none;
+      flex: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      box-shadow: 0 8px 22px rgba(37, 99, 235, 0.5);
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      box-shadow: 0 8px 22px rgba(37, 99, 235, 0.5);
+      cursor: pointer;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .toggle {
+      position: relative;
+      width: 32px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(209, 213, 219, 0.9);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.4);
+      transition: transform 0.16s ease;
+    }
+
+    .toggle.on {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+    }
+
+    .toggle.on .toggle-thumb {
+      transform: translateX(14px);
+    }
+
+    .timeline {
+      border-radius: 11px;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.07), rgba(15, 23, 42, 0.96));
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: #e5e7eb;
+    }
+
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .timeline-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: rgba(209, 213, 219, 0.9);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.9);
+    }
+
+    .legend-dot.beat {
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+    }
+
+    .legend-dot.accent {
+      background: #f97316;
+    }
+
+    .timeline-bar {
+      position: relative;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    .timeline-grid {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(
+        to right,
+        rgba(148, 163, 184, 0.35) 1px,
+        transparent 1px
+      );
+      background-size: 28px 100%;
+      opacity: 0.6;
+    }
+
+    .timeline-beats {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 7px 10px;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .beat-bar {
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #a5b4fc, #22c55e);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6), 0 10px 25px rgba(34, 197, 94, 0.7);
+    }
+
+    .beat-bar.accent {
+      background: linear-gradient(180deg, #fb923c, #f97316);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7), 0 10px 26px rgba(249, 115, 22, 0.9);
+    }
+
+    .beat-bar.s {
+      height: 12px;
+    }
+
+    .beat-bar.m {
+      height: 18px;
+    }
+
+    .beat-bar.l {
+      height: 26px;
+    }
+
+    .timeline-playhead {
+      position: absolute;
+      top: 0;
+      left: 16%;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.2), rgba(248, 250, 252, 0.9));
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7);
+    }
+
+    .timeline-playhead::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: -5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #f9fafb;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
+    }
+
+    .timeline-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: rgba(209, 213, 219, 0.9);
+    }
+
+    .player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .player-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .player-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #22c55e, #2563eb);
+      color: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.6);
+      transition: all 0.16s ease;
+      font-size: 14px;
+    }
+
+    .player-btn:hover {
+      box-shadow: 0 15px 36px rgba(37, 99, 235, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .player-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .player-time {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-soft);
+    }
+
+    .player-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .player-meta {
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .player-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .footer {
+      margin-top: 4px;
+      font-size: 10px;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .footer span strong {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    @media (max-width: 960px) {
+      .page {
+        padding: 20px 18px 24px;
+      }
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="title-block">
+      <div class="title-row">
+          <div class="logo-dot"></div>
+          <div class="title">
+            RunBeat · 跑步节奏增强
+            <span class="title-badge">MVP 版本 · 纯前端本地处理</span>
+          </div>
+        </div>
+        <div class="subtitle">
+          在浏览器本地完成：上传 / 分析 BPM / 设置鼓点 / 时间线编辑 / 导出跑步专用音乐（无需上传到服务器）。
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="pill">
+          <div class="pill-dot"></div>
+          <span>全部逻辑将在后续版本接入</span>
+        </div>
+        <button class="button-primary-ghost" type="button">
+          <span>查看 PRD 概要</span>
+          <span>↗</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="stepper">
+      <div class="step active">
+        <div class="step-index">1</div>
+        <div class="step-label">上传或选择示例</div>
+      </div>
+      <div class="step">
+        <div class="step-index">2</div>
+        <div class="step-label">分析节奏 BPM</div>
+      </div>
+      <div class="step">
+        <div class="step-index">3</div>
+        <div class="step-label">设置鼓点与节奏</div>
+      </div>
+      <div class="step">
+        <div class="step-index">4</div>
+        <div class="step-label">时间线微调</div>
+      </div>
+      <div class="step">
+        <div class="step-index">5</div>
+        <div class="step-label">导出跑步专用版本</div>
+      </div>
+    </div>
+
+    <main class="layout">
+      <!-- 左侧：上传 + 示例歌曲 -->
+      <aside class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">
+              步骤 1 · 上传 / 示例歌曲
+              <span class="panel-tag">跑步场景专用</span>
+            </div>
+            <div class="panel-subtitle" id="upload-panel-subtitle">
+              支持上传本地歌曲或使用示例歌曲，所有处理仅在本地浏览器内存中完成。
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-zone">
+          <div class="upload-icon">↑</div>
+          <div class="upload-title">拖拽一首歌曲到这里</div>
+          <div class="upload-subtitle">或点击按钮选择本地音乐文件（仅演示占位）</div>
+
+          <div class="upload-actions">
+            <button class="btn btn-primary" type="button" id="file-select-btn">
+              <span>选择本地文件</span>
+            </button>
+            <button class="btn btn-ghost" type="button" id="demo-load-single">
+              <span>快速体验：加载示例歌曲</span>
+            </button>
+          </div>
+
+          <input id="file-input" type="file" accept="audio/*" style="display:none" />
+
+          <div class="hint-text">
+            不会上传到服务器，一切分析与导出都在你的浏览器本地完成。
+          </div>
+        </div>
+
+        <div>
+          <div class="panel-subtitle" style="margin-bottom: 6px;">
+            或从下方示例歌单中选择一首，查看展示用 BPM 与信息：
+          </div>
+          <div class="demo-list" id="demo-list">
+            <div class="demo-item active" data-id="1">
+              <div class="demo-main">
+                <div class="demo-cover">A</div>
+                <div class="demo-texts">
+                  <div class="demo-title">Morning Run · 轻快热身</div>
+                  <div class="demo-meta">
+                    <span>3:42</span>
+                    <span>电子 · 跑步</span>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-badges">
+                <span class="badge badge-bpm">BPM 160</span>
+                <span class="badge badge-mode">适合轻松 5:30 /km</span>
+              </div>
+            </div>
+
+            <div class="demo-item" data-id="2">
+              <div class="demo-main">
+                <div class="demo-cover">B</div>
+                <div class="demo-texts">
+                  <div class="demo-title">Tempo Focus · 节奏巡航</div>
+                  <div class="demo-meta">
+                    <span>4:18</span>
+                    <span>氛围 · 节奏</span>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-badges">
+                <span class="badge badge-bpm">BPM 170</span>
+                <span class="badge badge-mode">配速 5:00 /km 推荐</span>
+              </div>
+            </div>
+
+            <div class="demo-item" data-id="3">
+              <div class="demo-main">
+                <div class="demo-cover">C</div>
+                <div class="demo-texts">
+                  <div class="demo-title">Peak Push · 冲刺片段</div>
+                  <div class="demo-meta">
+                    <span>2:56</span>
+                    <span>高能 · 电子</span>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-badges">
+                <span class="badge badge-bpm">BPM 180</span>
+                <span class="badge badge-mode">间歇冲刺 · 3:50 /km</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 右侧：BPM、鼓点、时间线、导出 -->
+      <section class="panel">
+        <div class="main-panel">
+          <div class="main-header">
+            <div class="song-info">
+              <div class="song-title-row">
+                <span id="current-song-title">Morning Run · 轻快热身（示例）</span>
+                <span class="song-tag">Demo 歌曲 · 仅做展示</span>
+              </div>
+              <div class="song-meta" id="current-song-meta">
+                <span id="meta-duration">未加载</span>
+                <span id="meta-bpm">BPM 160（示例）</span>
+                <span id="meta-confidence">BPM 可信度：--</span>
+              </div>
+            </div>
+            <div class="chip-row">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                <span>跑步节奏辅助 · 稳定步频</span>
+              </div>
+              <div class="chip">
+                <span class="pill-kbd">MVP Demo</span>
+                <span>当前仅展示界面结构</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区块：BPM 选择与模式 -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span>🎚</span>
+                BPM 模式选择与节奏控制
+              </div>
+              <div class="section-desc">
+                在自动检测 BPM 的基础上微调，或完全使用你指定的目标 BPM。
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="mode-switch" id="mode-switch">
+                <div class="mode-pill active" data-mode="auto">
+                  <div class="mode-radio">
+                    <div class="mode-radio-dot"></div>
+                  </div>
+                  <div class="mode-text">
+                    <div class="mode-label">根据歌曲节奏 · 自动检测</div>
+                    <div class="mode-sub">以检测到的 BPM 为基础，可轻微微调。</div>
+                  </div>
+                </div>
+                <div class="mode-pill" data-mode="custom">
+                  <div class="mode-radio">
+                    <div class="mode-radio-dot"></div>
+                  </div>
+                  <div class="mode-text">
+                    <div class="mode-label">自定义目标 BPM</div>
+                    <div class="mode-sub">忽略原曲节奏，统一为你想要的步频。</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bpm-row">
+                <div class="field-label">当前目标 BPM</div>
+                <div class="input-group">
+                  <input id="bpm-input" class="input" type="number" value="160" min="60" max="220" />
+                  <span style="font-size: 11px; color: var(--text-soft);">bpm</span>
+                </div>
+                <button class="btn-mini" type="button" id="btn-half">
+                  ÷2
+                </button>
+                <button class="btn-mini" type="button" id="btn-double">
+                  ×2
+                </button>
+                <span class="bpm-indicator">
+                  <span class="bpm-indicator-dot"></span>
+                  <span id="bpm-indicator-text">适合轻松跑节奏</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区块：鼓点预设与音量 -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span>🥁</span>
+                鼓点预设 · 跑步节奏模板
+              </div>
+              <div class="section-desc">
+                选择不同鼓点模板，后续会根据 BPM 生成对应的鼓点时间线并参与混音。
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="pattern-grid" id="pattern-grid">
+                <div class="pattern-card active" data-pattern="basic">
+                  <div class="pattern-name">基础四拍</div>
+                  <div class="pattern-desc">每一拍一个 Kick，适合理解歌曲节奏。</div>
+                  <div class="pattern-mini-line">
+                    <div class="pattern-bar.l"></div>
+                    <div class="pattern-bar.s"></div>
+                    <div class="pattern-bar.s"></div>
+                    <div class="pattern-bar.s"></div>
+                  </div>
+                </div>
+                <div class="pattern-card" data-pattern="run-double">
+                  <div class="pattern-name">跑步双拍</div>
+                  <div class="pattern-desc">每拍两下，对应左右脚落地，适合节奏跑。</div>
+                  <div class="pattern-mini-line">
+                    <div class="pattern-bar.l"></div>
+                    <div class="pattern-bar.m"></div>
+                    <div class="pattern-bar.l"></div>
+                    <div class="pattern-bar.m"></div>
+                  </div>
+                </div>
+                <div class="pattern-card" data-pattern="light">
+                  <div class="pattern-name">轻量提示</div>
+                  <div class="pattern-desc">细腻 Hihat，不打扰原曲，仅作背景提示。</div>
+                  <div class="pattern-mini-line">
+                    <div class="pattern-bar.s"></div>
+                    <div class="pattern-bar.s"></div>
+                    <div class="pattern-bar.s"></div>
+                    <div class="pattern-bar.s"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="slider-row">
+                <span class="field-label">鼓点音量</span>
+                <input class="slider" type="range" min="0" max="120" value="80" id="volume-slider" />
+                <span style="font-size: 11px; color: var(--text-soft);" id="volume-label">80%</span>
+              </div>
+              <div class="slider-row">
+                <span class="field-label">歌曲音量</span>
+                <input class="slider" type="range" min="0" max="120" value="100" id="song-volume-slider" />
+                <span style="font-size: 11px; color: var(--text-soft);" id="song-volume-label">100%</span>
+              </div>
+
+              <div class="toggle-row">
+                <div id="fade-toggle" class="toggle on">
+                  <div class="toggle-thumb"></div>
+                </div>
+                <span>启用淡入 / 淡出，避免鼓点开头和结尾过于生硬（示意占位）。</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区块：时间线可视化 -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span>📈</span>
+                时间线与鼓点可视编辑（示意）
+              </div>
+              <div class="section-desc">
+                根据当前 BPM 和鼓点预设生成鼓点事件，可视化查看并进行基础增删调整。
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="timeline">
+                <div class="timeline-header">
+                  <div class="timeline-label">
+                    <span style="font-size: 12px;">当前片段 · 0:30 - 1:15</span>
+                    <span class="badge" style="border-color: rgba(56,189,248,0.9); color:#0ea5e9; background:rgba(56,189,248,0.1);" id="timeline-mode-badge">
+                      鼓点时间线 · 可点击添加/删除
+                    </span>
+                  </div>
+                  <div class="legend">
+                    <div class="legend-item">
+                      <span class="legend-dot beat"></span>
+                      <span>主拍/次拍</span>
+                    </div>
+                    <div class="legend-item">
+                      <span class="legend-dot accent"></span>
+                      <span>强调拍（例如每小节第 1 拍）</span>
+                    </div>
+                  </div>
+                </div>
+                  <div class="timeline-bar" id="timeline-bar">
+                  <div class="timeline-grid"></div>
+                  <div class="timeline-beats" id="timeline-beats"></div>
+                  <div class="timeline-playhead" id="timeline-playhead"></div>
+                </div>
+                <div class="timeline-footer">
+                  <span>提示：未来这里可以通过点击/拖拽的方式，增删和调整具体鼓点位置。</span>
+                  <span>示例 BPM：<strong id="timeline-bpm-display">160</strong> bpm</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区块：预览与导出 -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span>🎧</span>
+                预览与导出（示意）
+              </div>
+              <div class="section-desc">
+                播放时在浏览器实时混合原曲与鼓点；导出时离线渲染为 MP3 文件下载。
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="player-row">
+                <div class="player-main">
+                  <button class="player-btn" type="button" id="play-btn">
+                    ▶
+                  </button>
+                  <div class="player-time">
+                    <span class="player-dot"></span>
+                    <span id="current-time">00:00</span>
+                    <span>/</span>
+                    <span id="total-time">00:00</span>
+                  </div>
+                  <div class="player-meta">
+                    原曲 + 鼓点混音预览（已接入基础逻辑，具体节奏效果视浏览器性能而定）
+                  </div>
+                </div>
+                <div class="player-actions">
+                  <button class="btn-mini" type="button" id="export-btn">导出 MP3</button>
+                  <span class="hint-text" id="export-hint">导出时会在本地进行一次离线混音与 MP3 编码。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>当前为 <strong>可运行的 MVP 版本</strong>，已接入基础 BPM 检测、鼓点生成与 MP3 导出逻辑（全部在本地浏览器完成）。</span>
+      <span>建议在桌面端 Chrome / Edge / Safari 中使用，长音频导出可能需要数十秒。</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/lamejs@1.2.0/lame.min.js"></script>
+  <script>
+    const demoSongs = [
+      {
+        id: "1",
+        title: "Morning Run · 轻快热身（示例）",
+        bpm: 160,
+        durationHint: "3:42",
+        mood: "适合轻松跑节奏",
+        url: "./demo-audio/morning-run.mp3"
+      },
+      {
+        id: "2",
+        title: "Tempo Focus · 节奏巡航（示例）",
+        bpm: 170,
+        durationHint: "4:18",
+        mood: "适合节奏跑 · 进入状态",
+        url: "./demo-audio/tempo-focus.mp3"
+      },
+      {
+        id: "3",
+        title: "Peak Push · 冲刺片段（示例）",
+        bpm: 180,
+        durationHint: "2:56",
+        mood: "间歇冲刺 · 高强度",
+        url: "./demo-audio/peak-push.mp3"
+      }
+    ];
+
+    const demoListEl = document.getElementById("demo-list");
+    const currentSongTitleEl = document.getElementById("current-song-title");
+    const metaDurationEl = document.getElementById("meta-duration");
+    const metaBpmEl = document.getElementById("meta-bpm");
+    const metaConfidenceEl = document.getElementById("meta-confidence");
+    const bpmInputEl = document.getElementById("bpm-input");
+    const bpmIndicatorTextEl = document.getElementById("bpm-indicator-text");
+    const timelineBpmDisplayEl = document.getElementById("timeline-bpm-display");
+    const modeSwitchEl = document.getElementById("mode-switch");
+    const btnHalfEl = document.getElementById("btn-half");
+    const btnDoubleEl = document.getElementById("btn-double");
+    const volumeSliderEl = document.getElementById("volume-slider");
+    const volumeLabelEl = document.getElementById("volume-label");
+    const songVolumeSliderEl = document.getElementById("song-volume-slider");
+    const songVolumeLabelEl = document.getElementById("song-volume-label");
+    const fadeToggleEl = document.getElementById("fade-toggle");
+    const fileSelectBtn = document.getElementById("file-select-btn");
+    const fileInputEl = document.getElementById("file-input");
+    const uploadZoneEl = document.querySelector(".upload-zone");
+    const playBtn = document.getElementById("play-btn");
+    const currentTimeEl = document.getElementById("current-time");
+    const totalTimeEl = document.getElementById("total-time");
+    const exportBtn = document.getElementById("export-btn");
+    const exportHintEl = document.getElementById("export-hint");
+    const timelineBarEl = document.getElementById("timeline-bar");
+    const timelineBeatsEl = document.getElementById("timeline-beats");
+    const timelinePlayheadEl = document.getElementById("timeline-playhead");
+    const uploadPanelSubtitleEl = document.getElementById("upload-panel-subtitle");
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let currentBuffer = null;
+    let currentSource = null;
+    let currentDrumSources = [];
+    let isPlaying = false;
+    let startTime = 0;
+    let pauseOffset = 0;
+    let animationFrameId = null;
+
+    let bpmInfo = {
+      detectedBpm: null,
+      targetBpm: 160,
+      mode: "auto",
+      confidence: "low"
+    };
+
+    let drumPatternId = "basic";
+    let drumEvents = [];
+    let drumBuffers = {
+      kick: null,
+      hat: null
+    };
+    let masterGain = null;     // 总输出音量（一般保持 1）
+    let songGain = null;       // 歌曲音量
+    let drumGain = null;       // 鼓点音量
+
+    function ensureAudioContext() {
+      if (!AudioContextClass) {
+        uploadPanelSubtitleEl.textContent = "当前浏览器不支持 Web Audio API，请在最新的 Chrome / Edge / Safari 中打开。";
+        return null;
+      }
+      if (!audioCtx) {
+        audioCtx = new AudioContextClass();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 1;
+        masterGain.connect(audioCtx.destination);
+
+        songGain = audioCtx.createGain();
+        songGain.gain.value = songVolumeSliderEl ? songVolumeSliderEl.value / 100 : 1;
+        songGain.connect(masterGain);
+
+        drumGain = audioCtx.createGain();
+        const initialDrum = volumeSliderEl ? volumeSliderEl.value / 100 : 0.8;
+        drumGain.gain.value = initialDrum * 1.4; // 整体抬高一点
+        drumGain.connect(masterGain);
+
+        createDrumBuffers();
+      }
+      return audioCtx;
+    }
+
+    function formatTime(sec) {
+      if (!isFinite(sec) || sec < 0) return "00:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function updateBpmMood(bpm) {
+      let mood;
+      if (bpm < 150) {
+        mood = "偏慢节奏 · 适合恢复跑";
+      } else if (bpm < 165) {
+        mood = "适合轻松跑节奏";
+      } else if (bpm < 178) {
+        mood = "节奏跑 · 配速训练";
+      } else {
+        mood = "高强度 · 间歇/冲刺";
+      }
+      bpmIndicatorTextEl.textContent = mood;
+      timelineBpmDisplayEl.textContent = bpm;
+    }
+
+    function createDrumBuffers() {
+      if (!audioCtx) return;
+      const sampleRate = audioCtx.sampleRate;
+
+      // 更短、更“砸”的 Kick，带一点高频点击
+      const kickLength = Math.floor(sampleRate * 0.16);
+      const kickBuffer = audioCtx.createBuffer(1, kickLength, sampleRate);
+      const kickData = kickBuffer.getChannelData(0);
+      for (let i = 0; i < kickLength; i++) {
+        const t = i / sampleRate;
+        const env = Math.exp(-t * 45);
+        const freq = 180 - t * 130; // 起音更高，下降更快
+        const body = Math.sin(2 * Math.PI * freq * t);
+        const clickEnv = Math.max(0, 1 - t * 220);
+        const click = (Math.random() * 2 - 1) * clickEnv * 0.45;
+        kickData[i] = (body * 0.9 + click) * env;
+      }
+
+      // 更尖锐的 Hihat：高频噪声 + 简单高通
+      const hatLength = Math.floor(sampleRate * 0.06);
+      const hatBuffer = audioCtx.createBuffer(1, hatLength, sampleRate);
+      const hatData = hatBuffer.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < hatLength; i++) {
+        const t = i / sampleRate;
+        const env = Math.exp(-t * 95);
+        const white = Math.random() * 2 - 1;
+        const high = white - last * 0.6; // 简单高通效果
+        last = white;
+        hatData[i] = high * env * 0.95;
+      }
+
+      drumBuffers.kick = kickBuffer;
+      drumBuffers.hat = hatBuffer;
+    }
+
+    function updateMetaForBuffer(buffer, sourceLabel) {
+      if (!buffer) {
+        metaDurationEl.textContent = "未加载";
+        totalTimeEl.textContent = "00:00";
+        return;
+      }
+      const duration = buffer.duration;
+      metaDurationEl.textContent = "时长 " + formatTime(duration) + (sourceLabel ? " · " + sourceLabel : "");
+      totalTimeEl.textContent = formatTime(duration);
+    }
+
+    function resetPlaybackState() {
+      if (currentSource) {
+        try {
+          currentSource.onended = null;
+          currentSource.stop();
+        } catch (e) {}
+      }
+      currentSource = null;
+      currentDrumSources.forEach((src) => {
+        try {
+          src.stop();
+        } catch (e) {}
+      });
+      currentDrumSources = [];
+      isPlaying = false;
+      startTime = 0;
+      pauseOffset = 0;
+      playBtn.textContent = "▶";
+      if (animationFrameId != null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      currentTimeEl.textContent = "00:00";
+    }
+
+    function loadFile(file) {
+      const ctx = ensureAudioContext();
+      if (!ctx || !file) return;
+      resetPlaybackState();
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const arrayBuffer = ev.target.result;
+        ctx.decodeAudioData(
+          arrayBuffer,
+          (buffer) => {
+            currentBuffer = buffer;
+            currentSongTitleEl.textContent = file.name + "（本地文件）";
+            updateMetaForBuffer(buffer, "本地上传");
+            detectAndUpdateBpm(buffer);
+          },
+          () => {
+            uploadPanelSubtitleEl.textContent = "解码音频失败，请尝试更换文件或使用其他浏览器。";
+          }
+        );
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function createSyntheticDemoBuffer(ctx, seconds, variant) {
+      const sampleRate = ctx.sampleRate || 44100;
+      const duration = Math.max(5, Math.min(60, seconds || 20));
+      const length = Math.floor(sampleRate * duration);
+      const buffer = ctx.createBuffer(2, length, sampleRate);
+
+      // 根据不同示例，设置不同节奏与能量
+      let bpm = 160;
+      let baseFreq = 220;
+      let padFreq = 440;
+      let drive = 0.4;
+      if (variant === "easy") {
+        bpm = 142;
+        baseFreq = 200;
+        padFreq = 350;
+        drive = 0.28;
+      } else if (variant === "steady") {
+        bpm = 166;
+        baseFreq = 230;
+        padFreq = 420;
+        drive = 0.38;
+      } else if (variant === "sprint") {
+        bpm = 182;
+        baseFreq = 260;
+        padFreq = 520;
+        drive = 0.5;
+      }
+
+      const beatPeriod = 60 / bpm;
+
+      for (let ch = 0; ch < 2; ch++) {
+        const data = buffer.getChannelData(ch);
+        const detune = ch === 0 ? 0 : 0.7; // 轻微左右声道差异
+        for (let i = 0; i < length; i++) {
+          const t = i / sampleRate;
+
+          // 和声底：两层正弦 + 一层软锯齿感
+          const base = Math.sin(2 * Math.PI * (baseFreq + detune) * t);
+          const pad = Math.sin(2 * Math.PI * (padFreq + detune * 2) * t);
+          const third = Math.sin(2 * Math.PI * (baseFreq * 1.5 + detune) * t);
+          const harm = base * 0.55 + pad * 0.25 + third * 0.2;
+
+          // 依据 BPM 的节奏起伏（侧链感）
+          const beatPhase = (t % beatPeriod) / beatPeriod; // 0-1
+          const pump = 0.25 + 0.75 * Math.pow(1 - beatPhase, 3);
+
+          // 简单的“底鼓+军鼓”点击感（合成示例本身的律动）
+          let click = 0;
+          const clickWidth = 0.02;
+          if (beatPhase < clickWidth) {
+            // 底鼓：低频冲击
+            const localT = beatPhase / clickWidth;
+            click += (1 - localT) * Math.sin(2 * Math.PI * 80 * t) * drive;
+          } else if (beatPhase > 0.5 && beatPhase < 0.5 + clickWidth) {
+            // 军鼓/拍手：噪声短促
+            const localT = (beatPhase - 0.5) / clickWidth;
+            const noise = (Math.random() * 2 - 1) * 0.4;
+            click += (1 - localT) * noise * drive;
+          }
+
+          // 总包络：让整段逐渐淡出，避免戛然而止
+          const globalEnv = Math.exp(-t * 0.15);
+
+          data[i] = (harm * pump * 0.6 + click) * globalEnv;
+        }
+      }
+      return buffer;
+    }
+
+    function useSyntheticDemoSong(ctx, song) {
+      resetPlaybackState();
+      let variant = "steady";
+      if (song && song.id === "1") variant = "easy";
+      else if (song && song.id === "2") variant = "steady";
+      else if (song && song.id === "3") variant = "sprint";
+      const buffer = createSyntheticDemoBuffer(ctx, 20, variant);
+      currentBuffer = buffer;
+      currentSongTitleEl.textContent = (song ? song.title : "示例歌曲") + "（内置合成示例）";
+      updateMetaForBuffer(buffer, "内置示例音频");
+      const demoBpm = song && song.bpm ? song.bpm : 160;
+      bpmInfo.detectedBpm = demoBpm;
+      bpmInfo.targetBpm = demoBpm;
+      bpmInfo.mode = "auto";
+      bpmInfo.confidence = "high";
+      bpmInputEl.value = demoBpm;
+      metaBpmEl.textContent = "BPM " + demoBpm + "（示例 / 自动检测）";
+      metaConfidenceEl.textContent = "BPM 可信度：高";
+      updateBpmMood(demoBpm);
+      drumEvents = generateDrumEvents(demoBpm, currentBuffer.duration, drumPatternId);
+      renderTimeline();
+    }
+
+    function loadDemoSong(song) {
+      const ctx = ensureAudioContext();
+      if (!ctx) {
+        return;
+      }
+      // 如果没有配置 URL，直接使用内置合成示例
+      if (!song || !song.url) {
+        useSyntheticDemoSong(ctx, song || null);
+        return;
+      }
+      resetPlaybackState();
+
+      fetch(song.url)
+        .then((res) => {
+          if (!res.ok) throw new Error("network");
+          return res.arrayBuffer();
+        })
+        .then((arrayBuffer) =>
+          ctx.decodeAudioData(
+            arrayBuffer,
+            (buffer) => {
+              currentBuffer = buffer;
+              currentSongTitleEl.textContent = song.title;
+              updateMetaForBuffer(buffer, "示例歌曲");
+              bpmInfo.detectedBpm = song.bpm;
+              bpmInfo.targetBpm = song.bpm;
+              bpmInfo.mode = "auto";
+              bpmInfo.confidence = "high";
+              bpmInputEl.value = song.bpm;
+              metaBpmEl.textContent = "BPM " + song.bpm + "（示例 / 自动检测）";
+              metaConfidenceEl.textContent = "BPM 可信度：高";
+              updateBpmMood(song.bpm);
+              drumEvents = generateDrumEvents(song.bpm, currentBuffer.duration, drumPatternId);
+              renderTimeline();
+            },
+            () => {
+              // 解码失败时退回到合成示例
+              useSyntheticDemoSong(ctx, song);
+            }
+          )
+        )
+        .catch(() => {
+          // 网络或路径问题，退回到合成示例
+          useSyntheticDemoSong(ctx, song);
+        });
+    }
+
+    function detectAndUpdateBpm(buffer) {
+      metaBpmEl.textContent = "正在分析 BPM…";
+      metaConfidenceEl.textContent = "BPM 可信度：分析中";
+      setTimeout(() => {
+        const { bpm, confidence } = detectBpmFromBuffer(buffer);
+        bpmInfo.detectedBpm = bpm;
+        bpmInfo.targetBpm = bpm;
+        bpmInfo.mode = "auto";
+        bpmInfo.confidence = confidence;
+        bpmInputEl.value = bpm;
+        metaBpmEl.textContent = "BPM " + bpm.toFixed(1) + "（自动检测）";
+        metaConfidenceEl.textContent = "BPM 可信度：" + (confidence === "high" ? "高" : confidence === "medium" ? "中" : "低");
+        updateBpmMood(bpm);
+        drumEvents = generateDrumEvents(bpmInfo.targetBpm, buffer.duration, drumPatternId);
+        renderTimeline();
+      }, 10);
+    }
+
+    function detectBpmFromBuffer(buffer) {
+      const channelData = buffer.getChannelData(0);
+      const sampleRate = buffer.sampleRate;
+      const sampleStep = 32;
+      const downsampled = [];
+      for (let i = 0; i < channelData.length; i += sampleStep) {
+        downsampled.push(Math.abs(channelData[i]));
+      }
+      const len = downsampled.length;
+      const maxSeconds = 120;
+      const maxSamples = Math.min(len, Math.floor((sampleRate / sampleStep) * maxSeconds));
+      const data = downsampled.slice(0, maxSamples);
+      let mean = 0;
+      for (let i = 0; i < data.length; i++) {
+        mean += data[i];
+      }
+      mean /= data.length || 1;
+      for (let i = 0; i < data.length; i++) {
+        data[i] -= mean;
+      }
+      const dsRate = sampleRate / sampleStep;
+      const bpmMin = 60;
+      const bpmMax = 200;
+      const minLag = Math.floor(dsRate * 60 / bpmMax);
+      const maxLag = Math.ceil(dsRate * 60 / bpmMin);
+      let bestLag = minLag;
+      let bestCorr = 0;
+      for (let lag = minLag; lag <= maxLag; lag++) {
+        let sum = 0;
+        for (let i = 0; i + lag < data.length; i++) {
+          sum += data[i] * data[i + lag];
+        }
+        if (sum > bestCorr) {
+          bestCorr = sum;
+          bestLag = lag;
+        }
+      }
+      let bpm = 60 * dsRate / bestLag;
+      while (bpm > 200) bpm /= 2;
+      while (bpm < 60) bpm *= 2;
+      let confidence = "medium";
+      if (bestCorr > 0.001) confidence = "high";
+      if (bestCorr < 0.0002) confidence = "low";
+      return { bpm, confidence };
+    }
+
+    function generateDrumEvents(bpm, durationSec, patternId) {
+      const events = [];
+      const beatLength = 60 / bpm;
+      const totalBeats = Math.ceil(durationSec / beatLength);
+      for (let i = 0; i < totalBeats; i++) {
+        const beatTime = i * beatLength;
+        if (patternId === "basic") {
+          events.push({ timeSec: beatTime, type: "kick", accent: i % 4 === 0 });
+        } else if (patternId === "run-double") {
+          events.push({ timeSec: beatTime, type: "kick", accent: true });
+          const secondTime = beatTime + beatLength / 2;
+          if (secondTime < durationSec) {
+            events.push({ timeSec: secondTime, type: "hat", accent: false });
+          }
+        } else if (patternId === "light") {
+          const interval = beatLength / 2;
+          for (let j = 0; j < 2; j++) {
+            const t = beatTime + j * interval;
+            if (t < durationSec) {
+              events.push({ timeSec: t, type: "hat", accent: false });
+            }
+          }
+        }
+      }
+      return events;
+    }
+
+    function renderTimeline() {
+      if (!timelineBeatsEl || !currentBuffer || !drumEvents.length) {
+        if (timelineBeatsEl) timelineBeatsEl.innerHTML = "";
+        return;
+      }
+      const duration = currentBuffer.duration;
+      timelineBeatsEl.innerHTML = "";
+      const maxShown = 80;
+      const slice = drumEvents.slice(0, maxShown);
+      slice.forEach((ev) => {
+        const el = document.createElement("div");
+        el.className = "beat-bar " + (ev.accent ? "accent l" : "m");
+        const fraction = Math.min(1, Math.max(0, ev.timeSec / duration));
+        el.style.position = "absolute";
+        el.style.left = (fraction * 100).toFixed(2) + "%";
+        el.style.bottom = "7px";
+        el.dataset.timeSec = String(ev.timeSec);
+        timelineBeatsEl.appendChild(el);
+      });
+    }
+
+    function scheduleDrums(startAt, offsetSec) {
+      if (!audioCtx || !currentBuffer || !drumEvents.length || !drumBuffers.kick || !drumBuffers.hat) return;
+      const events = drumEvents;
+      const duration = currentBuffer.duration;
+      currentDrumSources = [];
+      const fadeIn = fadeToggleEl.classList.contains("on");
+      events.forEach((ev) => {
+        if (ev.timeSec < offsetSec || ev.timeSec > duration) return;
+        const when = startAt + (ev.timeSec - offsetSec);
+        const src = audioCtx.createBufferSource();
+        src.buffer = ev.type === "kick" ? drumBuffers.kick : drumBuffers.hat;
+        const g = audioCtx.createGain();
+        let baseGain = (volumeSliderEl ? volumeSliderEl.value : 80) / 100;
+        baseGain *= 1.3; // 事件层面再整体抬一点
+        if (ev.accent) baseGain *= 1.2;
+        g.gain.value = baseGain;
+        if (fadeIn && ev.timeSec < 1) {
+          g.gain.setValueAtTime(0, when);
+          g.gain.linearRampToValueAtTime(baseGain, when + 0.3);
+        }
+        src.connect(g);
+        g.connect(drumGain);
+        src.start(when);
+        currentDrumSources.push(src);
+      });
+    }
+
+    function startPlayback() {
+      const ctx = ensureAudioContext();
+      if (!ctx || !currentBuffer) return;
+      if (ctx.state === "suspended") {
+        ctx.resume();
+      }
+      if (isPlaying) return;
+      const source = ctx.createBufferSource();
+      source.buffer = currentBuffer;
+      if (songGain) {
+        source.connect(songGain);
+      } else {
+        source.connect(masterGain);
+      }
+      const offset = pauseOffset || 0;
+      const now = ctx.currentTime;
+      source.start(now, offset);
+      source.onended = () => {
+        if (!isPlaying) return;
+        resetPlaybackState();
+      };
+      currentSource = source;
+      scheduleDrums(now, offset);
+      isPlaying = true;
+      startTime = now - offset;
+      playBtn.textContent = "⏸";
+      tickProgress();
+    }
+
+    function pausePlayback() {
+      if (!audioCtx) return;
+      if (!isPlaying) return;
+      const now = audioCtx.currentTime;
+      pauseOffset = now - startTime;
+      resetPlaybackState();
+      currentTimeEl.textContent = formatTime(pauseOffset);
+    }
+
+    function tickProgress() {
+      if (!audioCtx || !currentBuffer || !isPlaying) return;
+      const now = audioCtx.currentTime;
+      const pos = now - startTime;
+      currentTimeEl.textContent = formatTime(pos);
+      const fraction = Math.min(1, Math.max(0, pos / currentBuffer.duration));
+      if (timelinePlayheadEl) {
+        timelinePlayheadEl.style.left = (fraction * 100).toFixed(2) + "%";
+      }
+      animationFrameId = requestAnimationFrame(tickProgress);
+    }
+
+    function exportMp3() {
+      const ctx = ensureAudioContext();
+      if (!ctx || !currentBuffer) {
+        exportHintEl.textContent = "请先上传或选择一首歌曲。";
+        return;
+      }
+      if (!window.lamejs) {
+        exportHintEl.textContent = "MP3 编码库未加载成功，请检查网络或稍后重试。";
+        return;
+      }
+      exportBtn.disabled = true;
+      exportHintEl.textContent = "正在离线混音并编码为 MP3，请稍候…";
+
+      const sampleRate = ctx.sampleRate;
+      const offlineCtx = new AudioContextClass({
+        sampleRate,
+        length: currentBuffer.length,
+        numberOfChannels: 2
+      });
+      const offlineSource = offlineCtx.createBufferSource();
+      offlineSource.buffer = currentBuffer;
+
+      const offlineMaster = offlineCtx.createGain();
+      offlineMaster.gain.value = 1;
+      offlineMaster.connect(offlineCtx.destination);
+
+      const offlineSongGain = offlineCtx.createGain();
+      const songVol = songVolumeSliderEl ? songVolumeSliderEl.value / 100 : 1;
+      offlineSongGain.gain.value = songVol;
+      offlineSource.connect(offlineSongGain);
+      offlineSongGain.connect(offlineMaster);
+
+      const offlineDrumGain = offlineCtx.createGain();
+      const drumVol = volumeSliderEl ? volumeSliderEl.value / 100 : 0.8;
+      offlineDrumGain.gain.value = drumVol;
+      offlineDrumGain.connect(offlineMaster);
+
+      drumEvents.forEach((ev) => {
+        const src = offlineCtx.createBufferSource();
+        src.buffer = ev.type === "kick" ? drumBuffers.kick : drumBuffers.hat;
+        src.connect(offlineDrumGain);
+        src.start(ev.timeSec);
+      });
+
+      offlineSource.start(0);
+
+      offlineCtx.startRendering().then((renderedBuffer) => {
+        const left = renderedBuffer.getChannelData(0);
+        const right = renderedBuffer.numberOfChannels > 1 ? renderedBuffer.getChannelData(1) : left;
+        const wavLength = renderedBuffer.length;
+        const lame = window.lamejs;
+        const mp3encoder = new lame.Mp3Encoder(2, sampleRate, 192);
+        const blockSize = 1152;
+        const mp3Data = [];
+        const bufferL = new Int16Array(blockSize);
+        const bufferR = new Int16Array(blockSize);
+        let i = 0;
+        while (i < wavLength) {
+          const sliceL = left.subarray(i, i + blockSize);
+          const sliceR = right.subarray(i, i + blockSize);
+          for (let j = 0; j < blockSize; j++) {
+            bufferL[j] = sliceL[j] ? sliceL[j] * 32767 : 0;
+            bufferR[j] = sliceR[j] ? sliceR[j] * 32767 : 0;
+          }
+          const mp3buf = mp3encoder.encodeBuffer(bufferL, bufferR);
+          if (mp3buf.length > 0) {
+            mp3Data.push(mp3buf);
+          }
+          i += blockSize;
+        }
+        const endBuf = mp3encoder.flush();
+        if (endBuf.length > 0) {
+          mp3Data.push(endBuf);
+        }
+        const blob = new Blob(mp3Data, { type: "audio/mpeg" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const bpmLabel = bpmInfo.targetBpm ? "_bpm" + Math.round(bpmInfo.targetBpm) : "";
+        a.download = "runbeat" + bpmLabel + "_mix.mp3";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        exportHintEl.textContent = "导出完成，可以在任意播放器或跑步 App 中使用。";
+        exportBtn.disabled = false;
+      }).catch(() => {
+        exportHintEl.textContent = "离线混音或编码失败，请重试或尝试缩短音频时长。";
+        exportBtn.disabled = false;
+      });
+    }
+
+    demoListEl.addEventListener("click", (e) => {
+      const itemEl = e.target.closest(".demo-item");
+      if (!itemEl) return;
+      const id = itemEl.dataset.id;
+      const song = demoSongs.find((s) => s.id === id);
+      if (!song) return;
+
+      demoListEl.querySelectorAll(".demo-item").forEach((el) => el.classList.remove("active"));
+      itemEl.classList.add("active");
+
+      loadDemoSong(song);
+    });
+
+    const demoLoadSingleBtn = document.getElementById("demo-load-single");
+    if (demoLoadSingleBtn) {
+      demoLoadSingleBtn.addEventListener("click", () => {
+        const first = demoSongs[0];
+        const firstItem = demoListEl.querySelector(".demo-item[data-id='" + first.id + "']");
+        if (firstItem) {
+          firstItem.click();
+        } else {
+          loadDemoSong(first);
+        }
+      });
+    }
+
+    bpmInputEl.addEventListener("input", () => {
+      const value = parseFloat(bpmInputEl.value);
+      if (!isNaN(value)) {
+        bpmInfo.targetBpm = value;
+        updateBpmMood(value);
+        if (currentBuffer) {
+          drumEvents = generateDrumEvents(bpmInfo.targetBpm, currentBuffer.duration, drumPatternId);
+          renderTimeline();
+        }
+      }
+    });
+
+    btnHalfEl.addEventListener("click", () => {
+      let value = parseFloat(bpmInputEl.value) || (bpmInfo.detectedBpm || 160);
+      value = Math.max(60, Math.round(value / 2));
+      bpmInputEl.value = value;
+      bpmInfo.targetBpm = value;
+      updateBpmMood(value);
+      if (currentBuffer) {
+        drumEvents = generateDrumEvents(bpmInfo.targetBpm, currentBuffer.duration, drumPatternId);
+        renderTimeline();
+      }
+    });
+
+    btnDoubleEl.addEventListener("click", () => {
+      let value = parseFloat(bpmInputEl.value) || (bpmInfo.detectedBpm || 160);
+      value = Math.min(220, value * 2);
+      bpmInputEl.value = value;
+      bpmInfo.targetBpm = value;
+      updateBpmMood(value);
+      if (currentBuffer) {
+        drumEvents = generateDrumEvents(bpmInfo.targetBpm, currentBuffer.duration, drumPatternId);
+        renderTimeline();
+      }
+    });
+
+    modeSwitchEl.addEventListener("click", (e) => {
+      const pill = e.target.closest(".mode-pill");
+      if (!pill) return;
+      const mode = pill.dataset.mode;
+
+      modeSwitchEl.querySelectorAll(".mode-pill").forEach((el) => el.classList.remove("active"));
+      pill.classList.add("active");
+
+      if (mode === "auto") {
+        bpmInfo.mode = "auto";
+        if (bpmInfo.detectedBpm) {
+          bpmInputEl.value = bpmInfo.detectedBpm;
+          bpmInfo.targetBpm = bpmInfo.detectedBpm;
+          updateBpmMood(bpmInfo.targetBpm);
+        }
+      } else if (mode === "custom") {
+        bpmInfo.mode = "custom";
+      }
+      if (currentBuffer) {
+        drumEvents = generateDrumEvents(bpmInfo.targetBpm, currentBuffer.duration, drumPatternId);
+        renderTimeline();
+      }
+    });
+
+    const patternGridEl = document.getElementById("pattern-grid");
+    patternGridEl.addEventListener("click", (e) => {
+      const card = e.target.closest(".pattern-card");
+      if (!card) return;
+      patternGridEl.querySelectorAll(".pattern-card").forEach((el) => el.classList.remove("active"));
+      card.classList.add("active");
+      drumPatternId = card.dataset.pattern || "basic";
+      if (currentBuffer && bpmInfo.targetBpm) {
+        drumEvents = generateDrumEvents(bpmInfo.targetBpm, currentBuffer.duration, drumPatternId);
+        renderTimeline();
+      }
+    });
+
+    if (volumeSliderEl && volumeLabelEl) {
+      volumeLabelEl.textContent = volumeSliderEl.value + "%";
+      volumeSliderEl.addEventListener("input", () => {
+        volumeLabelEl.textContent = volumeSliderEl.value + "%";
+        if (drumGain) {
+          drumGain.gain.value = (volumeSliderEl.value / 100) * 1.4;
+        }
+      });
+    }
+
+    if (songVolumeSliderEl && songVolumeLabelEl) {
+      songVolumeLabelEl.textContent = songVolumeSliderEl.value + "%";
+      songVolumeSliderEl.addEventListener("input", () => {
+        songVolumeLabelEl.textContent = songVolumeSliderEl.value + "%";
+        if (songGain) {
+          songGain.gain.value = songVolumeSliderEl.value / 100;
+        }
+      });
+    }
+
+    fadeToggleEl.addEventListener("click", () => {
+      fadeToggleEl.classList.toggle("on");
+    });
+
+    if (fileSelectBtn && fileInputEl) {
+      fileSelectBtn.addEventListener("click", () => {
+        fileInputEl.click();
+      });
+      fileInputEl.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          demoListEl.querySelectorAll(".demo-item").forEach((el) => el.classList.remove("active"));
+          loadFile(file);
+        }
+      });
+    }
+
+    if (uploadZoneEl) {
+      ["dragenter", "dragover"].forEach((type) => {
+        uploadZoneEl.addEventListener(type, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadZoneEl.style.borderColor = "rgba(37,99,235,0.9)";
+          uploadZoneEl.style.background = "radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), rgba(255, 255, 255, 0.98))";
+        });
+      });
+      ["dragleave", "drop"].forEach((type) => {
+        uploadZoneEl.addEventListener(type, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadZoneEl.style.borderColor = "rgba(148,163,184,0.9)";
+          uploadZoneEl.style.background = "radial-gradient(circle at top left, rgba(37, 99, 235, 0.07), rgba(255, 255, 255, 0.9))";
+        });
+      });
+      uploadZoneEl.addEventListener("drop", (e) => {
+        const dt = e.dataTransfer;
+        if (!dt || !dt.files || !dt.files[0]) return;
+        const file = dt.files[0];
+        demoListEl.querySelectorAll(".demo-item").forEach((el) => el.classList.remove("active"));
+        loadFile(file);
+      });
+    }
+
+    if (timelineBarEl) {
+      timelineBarEl.addEventListener("click", (e) => {
+        if (!currentBuffer || !bpmInfo.targetBpm) return;
+        const rect = timelineBarEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const fraction = Math.min(1, Math.max(0, x / rect.width));
+        const candidateTime = fraction * currentBuffer.duration;
+        const beatLength = 60 / bpmInfo.targetBpm;
+        const snapped = Math.round(candidateTime / beatLength) * beatLength;
+        const existingIndex = drumEvents.findIndex((ev) => Math.abs(ev.timeSec - snapped) < beatLength * 0.25);
+        if (existingIndex >= 0) {
+          drumEvents.splice(existingIndex, 1);
+        } else {
+          drumEvents.push({ timeSec: snapped, type: "hat", accent: false });
+        }
+        drumEvents.sort((a, b) => a.timeSec - b.timeSec);
+        renderTimeline();
+      });
+    }
+
+    if (playBtn) {
+      playBtn.addEventListener("click", () => {
+        if (!isPlaying) {
+          startPlayback();
+        } else {
+          pausePlayback();
+        }
+      });
+    }
+
+    if (exportBtn) {
+      exportBtn.addEventListener("click", () => {
+        exportMp3();
+      });
+    }
+
+    updateBpmMood(parseInt(bpmInputEl.value, 10) || 160);
+  </script>
+</body>
+</html>
+
